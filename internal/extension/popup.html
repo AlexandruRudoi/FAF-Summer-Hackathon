@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Car Data Comparator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background-color: #f0f2f5;
+            color: #333;
+            width: 360px; /* Adjusted width for a larger popup */
+        }
+        .hidden {
+            display: none;
+        }
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #645cff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #5648cc;
+        }
+        #result {
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: auto; /* Ensure it scrolls if content is too large */
+        }
+        .data-item {
+            background-color: #645cff;
+            color: #fff;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            font-family: monospace; /* Ensuring JSON is well readable */
+        }
+    </style>
+</head>
+<body>
+    <div id="inputArea">
+        <h1>Car Data Comparison</h1>
+        <input type="text" id="url1" placeholder="Enter URL 1">
+        <input type="text" id="url2" placeholder="Enter URL 2">
+        <button id="compare">Compare</button>
+    </div>
+    <div id="result" class="hidden"></div>
+    <script src="popup.js"></script>
+</body>
+</html>

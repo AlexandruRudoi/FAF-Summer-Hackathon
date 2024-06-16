@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Car Comparator</title>
+</head>
+<body>
+    <h1>Enter URLs to Compare Cars</h1>
+    <form action="/api/comparative" method="post" onsubmit="submitForm(event)">
+        <input type="text" id="url1" name="url1" placeholder="Enter URL 1" required><br>
+        <input type="text" id="url2" name="url2" placeholder="Enter URL 2" required><br>
+        <button type="submit">Compare</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        function submitForm(event) {
+            event.preventDefault();
+            const url1 = document.getElementById('url1').value;
+            const url2 = document.getElementById('url2').value;
+
+            fetch('/api/comparative', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ url1: url1, url2: url2 })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
+
