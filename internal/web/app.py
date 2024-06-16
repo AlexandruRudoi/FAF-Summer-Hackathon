@@ -32,7 +32,7 @@ def api_comparative():
             res1 = response.json().get('response1')
             res2 = response.json().get('response2')
 
-            nltk.download('punkt')
+            # nltk.download('punkt')
             sentences = sent_tokenize(res1)
             # sentences2 = sent_tokenize(res2)
 
@@ -53,7 +53,7 @@ def api_comparative():
             else:
                 res2 = "No valid brackets found"
 
-            return jsonify({'1': res1, '2':res2})  # Directly pass on the JSON response
+            return jsonify({'res1': res1, 'res2':res2})  # Directly pass on the JSON response
         else:
             return jsonify({'error': 'API request failed', 'status_code': response.status_code}), 502
 
@@ -65,10 +65,12 @@ def api_comparative():
 def auto_submit():
     data = request.get_json()
     link = data.get('link', 'No link provided')
-    task = f"Give me the name of the product on the link without any comments: {link}"
+    task = f"Give me the name of the product on the link and no other details: {link}"
     llm = Groq(model="mixtral-8x7b-32768", api_key="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")
     response = llm.complete(task)
     string_request = str(response)
+    # url = 'https://www.bing.com/images/search?q=' + string_request + '&qs=n&form=QBIDMH&sp=-1&lq=0&pq=bmw&sc=10-3&cvid=29AE2B5AB4834EBD9959024378020AD5&ghsh=0&ghacc=0&first=1'
+
     url = 'https://www.google.com/search?q=' + string_request + '&sca_esv=1a90f3acf3a57e4e&sxsrf=ADLYWIIAd03qzWG33VhqkU2QkZ5bxtriKQ:1718517096517&source=hp&biw=1536&bih=730&ei=aH1uZpeoHZ_ixc8PyoGsgAk&iflsig=AL9hbdgAAAAAZm6LeNmpqIvsUmD3LWgZyONUuGwDiGcy&oq=&gs_lp=EgNpbWciACoCCAAyBxAjGCcY6gIyBxAjGCcY6gIyBxAjGCcY6gJI-wpQAFgAcAF4AJABAJgBAKABAKoBALgBAcgBAIoCC2d3cy13aXotaW1nmAIBoAIKqAIDmAMKkgcBMaAHAA&sclient=img&udm=2'  # Replace with your target URL
     images = fetch_images(url)
 
@@ -77,7 +79,7 @@ def auto_submit():
         # image_bytes = BytesIO(images[1])
         # encoded_string = base64.b64encode(image_bytes.getvalue()).decode('utf-8')
         # base64_image = f"data:image/jpeg;base64,{encoded_string}"
-        return jsonify({'image': images[1], 'message': 'Images fetched successfully'})
+        return jsonify({'image': images[2], 'message': 'Images fetched successfully'})
     else:
         return jsonify({'error': 'No images found'}), 404
 

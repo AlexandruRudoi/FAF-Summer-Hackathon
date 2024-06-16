@@ -5,21 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-    <title>Data Analyzer</title>
+    <title>TechVerdict</title>
+    <style>
+        .comparison-table {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px;
+        }
+        .comparison-table .car {
+            width: 45%;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .comparison-table .car h2 {
+            text-align: center;
+        }
+        .comparison-table .advantage, .comparison-table .disadvantage {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            color: #fff;
+        }
+        .comparison-table .advantage {
+            background-color: #4CAF50; /* Green */
+        }
+        .comparison-table .disadvantage {
+            background-color: #F44336; /* Red */
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
     <header>
         <img src="{{ url_for('static', filename='images/icon.png') }}" alt="" class="logo">
-        <h3 class="title">Data Analyzer</h3>
+        <h3 class="title">TechVerdict</h3>
     </header>
 
     <!-- Main -->
-    <main class="centered">
-        <h1>Enter URLs to Compare Products</h1>
+    <main>
+        <h1 id="title" class="centered">Enter URLs to Compare Products</h1>
         <form action="/api/comparative" method="post" onsubmit="submitForm(event)">
-            <div class="input-container">
-                <div class="input-group">
+            <div class="input-container centered" id="d-before">
+                <div class="input-group ">
                     <input type="text" id="url1" name="url1" placeholder="Enter URL 1" required>
                     <div id="result1" class="cl-result"></div>
                 </div>
@@ -28,11 +57,10 @@
                     <div id="result2" class="cl-result"></div>
                 </div>
             </div>
-            <button type="submit" class="btn" id="submit">Compare</button>
+            <button type="submit" class="btn centered" id="submit">Compare</button>
         </form>
-        <div>
-            <button id="backButton" style="display: none;">Back</button>
-            <h1 id="f-title" class="h1-dynamic" style="display: none;">Data Analysis</h1>
+        <div id="d-after" style="display: none;">
+            <button id="backButton" style="margin-left: 1em;">Back</button>
             <div id="result"></div>
         </div>
     </main>
@@ -60,6 +88,68 @@
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <script src="{{ url_for('static', filename='main.js') }}"></script>
     <script>
+        const afterDiv = document.getElementById('d-after');
+        const beforeDiv = document.getElementById('d-before');
+        const submitButton = document.getElementById('submit');
+        const title = document.getElementById('title');
+        afterDiv.style.display = 'none';
+        function formatCarComparison(text) {
+            // Split the text into sentences or segments
+            let segments = text.split('. ');
+
+            // Initialize variables to store the formatted text
+            let formattedText = '';
+            let isList = false;
+            let isNumberedList = false;
+
+            segments.forEach((segment, index) => {
+                // Check for keywords to identify sections
+                if (segment.includes('similarities') || segment.includes('features such as')) {
+                    formattedText += `<p>${segment}:</p><ul>`;
+                    isList = true;
+                    isNumberedList = false;
+                } else if (segment.includes('differences') || segment.includes('key differences')) {
+                    if (isList) {
+                        formattedText += '</ul>';
+                        isList = false;
+                    }
+                    formattedText += `<p>${segment}:</p><ul>`;
+                    isList = true;
+                    isNumberedList = false;
+                } else if (segment.includes('alternatives') || segment.includes('options to consider')) {
+                    if (isList) {
+                        formattedText += '</ul>';
+                        isList = false;
+                    }
+                    formattedText += `<p>${segment}:</p><ol>`;
+                    isList = true;
+                    isNumberedList = true;
+                } else if (segment.match(/^\d+\./)) {
+                    if (!isNumberedList) {
+                        formattedText += '<ol>';
+                        isNumberedList = true;
+                    }
+                    formattedText += `<li>${segment.substring(segment.indexOf(' ') + 1)}</li>`;
+                } else if (segment.startsWith('- ')) {
+                    formattedText += `<li>${segment.substring(2)}</li>`;
+                } else {
+                    if (isList) {
+                        formattedText += isNumberedList ? '</ol>' : '</ul>';
+                        isList = false;
+                        isNumberedList = false;
+                    }
+                    formattedText += `<p>${segment}.</p>`;
+                }
+            });
+
+            // Close any remaining open list
+            if (isList) {
+                formattedText += isNumberedList ? '</ol>' : '</ul>';
+            }
+
+            return formattedText;
+        }
+        
         function submitForm(event) {
             event.preventDefault();
             const url1 = document.getElementById('url1').value;
@@ -74,7 +164,15 @@
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById('result').innerHTML = '<p>' + JSON.stringify(data, null, 2) + '</p>';
+                afterDiv.style.display = 'block';
+                beforeDiv.style.display = 'none';
+                submitButton.style.display = 'none';
+                title.innerHTML = 'Data Analysis';
+                let modifiedString = JSON.stringify(data.res1, null, 1);
+                let modifiedString2 = JSON.stringify(data.res2, null, 1);
+                document.getElementById('result').innerHTML = '<pre style="margin: 0 10%; text-align: left; white-space: pre-wrap;">' + formatCarComparison(modifiedString) + '</pre>'
+                + '<br';
+                
             })
             .catch(error => console.error('Error:', error));
         }
@@ -91,7 +189,7 @@
             .then(data => {
                 if (data.image) {
                     // Assuming you want to display the first image
-                    document.getElementById('result1').innerHTML = `<img src="${data.image}" alt="Loaded Image" />`;
+                    document.getElementById('result1').innerHTML = `<img src="${data.image}" alt="Loaded Image" style="width: 30%" />`;
                 } else {
                     console.error('No image data received.');
                 }
@@ -111,7 +209,7 @@
             .then(data => {
                 if (data.image) {
                     // Assuming you want to display the first image
-                    document.getElementById('result2').innerHTML = `<img src="${data.image}" alt="Loaded Image" />`;
+                    document.getElementById('result2').innerHTML = `<img src="${data.image}" alt="Loaded Image" style="width: 30%" />`;
                 } else {
                     console.error('No image data received.');
                 }
@@ -120,8 +218,12 @@
         });
 
         document.getElementById('backButton').addEventListener('click', function() {
-            document.getElementById('backButton').style.display = 'none';
+            afterDiv.style.display = 'none';
+            beforeDiv.style.display = 'block';
+            submitButton.style.display = 'block';
+            title.innerHTML = 'Enter URLs to Compare Products';
         });
+        
     </script>
 </body>
 </html>

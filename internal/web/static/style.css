@@ -72,10 +72,12 @@ main {
   width: 300px;
 }
 
-#backButton {
-    margin-top: 5%;
-    background: linear-gradient(to right, #8576FF, #7BC9FF);
-    width: 150px;
+.centered {
+    display: block;
+    margin-top: 1em;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
 }
 
 #submit:hover {
@@ -99,20 +101,12 @@ main {
     color: #333;
 }
 
-.centered {
-    display: block;
-    margin-top: 6em;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
-}
-
 .input-container {
     display: flex;
     justify-content: space-between; /* Centers and provides space between the groups */
     gap: 40px;
     padding: 0;
-    width: 100%;
+    width: 80%;
 }
 
 .input-group {
@@ -161,6 +155,13 @@ input[type="text"].error {
     box-shadow: 0 0 8px rgba(255, 107, 107, 0.5); /* Red glow */
 }
 
+#backButton {
+    margin-top: 3%;
+    background: linear-gradient(to right, #8576FF, #7BC9FF);
+    width: 150px;
+    left: 0;
+    margin-left: 0;
+}
 
 .footer {
   position: relative;
